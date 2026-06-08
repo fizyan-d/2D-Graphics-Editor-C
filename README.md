@@ -9,7 +9,7 @@ A simple, console-based 2D graphics editor written in C. The program uses a 2D c
 
 ## 📅 3-Day Development Plan
 - [x] **Day 1 :** Set up the project structure, build the main menu loop, initialize the canvas, and implement all 4 core drawing functions (Line, Rectangle, Triangle, Circle).
-- [ ] **Day 2:** Implement the object management layer (adding tracking for separate shapes to allow modifying and deleting specific objects).
+- [x] **Day 2:(current)** Implement the object management layer (adding tracking for separate shapes to allow modifying and deleting specific objects).
 - [ ] **Day 3:** Add edge-case validation (preventing array out-of-bounds crashes), code cleanups, and final submission testing.
 
 ## 💻 How to Run the Project

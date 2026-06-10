@@ -6,55 +6,62 @@
 #define COLS 50
 #define MAX_OBJECTS 100
 
-// Shape types enumeration
 typedef enum { LINE, RECTANGLE, TRIANGLE, CIRCLE } ShapeType;
 
-// Structure to track every shape drawn
 typedef struct {
     int id;
     ShapeType type;
-    int coords[6]; // Stores coordinates: [x1, y1, x2, y2, x3, y3] or [xc, yc, radius]
-    int active;    // 1 if object exists, 0 if deleted
+    int coords[6]; 
+    int active;    
 } GraphicalObject;
 
-// Global Variables
 char canvas[ROWS][COLS];
 GraphicalObject objectList[MAX_OBJECTS];
 int objectCount = 0;
 
-// Core Engine Functions
+// Core Infrastructure Modules
 void initCanvas();
 void printCanvas();
 int checkBounds(int x, int y);
 void redrawCanvas();
 
-// Shape Logic Modules
+// Shape Math Matrix Plotting
 void drawLine(int x1, int y1, int x2, int y2);
 void drawRectangle(int x1, int y1, int x2, int y2);
 void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 void drawCircle(int xc, int yc, int radius);
 
-// Day 2 Features: Management Functions
+// Object Management & Scrubber Functions
 void addObject(ShapeType type, int c[]);
 void deleteObject(int id);
 void modifyObject(int id);
 void listObjects();
+void clearInputBuffer();
 
 int main() {
     int choice;
     initCanvas();
 
     while (1) {
-        printf("\n=== 2D GRAPHICS EDITOR (Day 2: Object Tracked) ===\n");
-        printf("1. Display Canvas\n");
-        printf("2. Draw a Shape\n");
-        printf("3. List Active Objects\n");
-        printf("4. Delete an Object\n");
-        printf("5. Modify an Object\n");
-        printf("6. Clear/Wipe Canvas\n");
-        printf("7. Exit\n");
-        printf("Choose an option: ");
-        scanf("%d", &choice);
+        printf("\n==================================================");
+        printf("\n    2D GRAPHICS EDITOR v1.0 (Final Submission)   ");
+        printf("\n==================================================");
+        printf("\n1. Display Interactive Canvas");
+        printf("\n2. Draw a Shape Vector");
+        printf("\n3. List Registered Shapes");
+        printf("\n4. Delete a Shape Object");
+        printf("\n5. Modify Shape Coordinates");
+        printf("\n6. Wipe Canvas Completely");
+        printf("\n7. Exit Project");
+        printf("\n==================================================");
+        printf("\nChoose an option (1-7): ");
+        
+        // Day 3 Security: Protects against character inputs crashing the menu loop
+        if (scanf("%d", &choice) != 1) {
+            printf("\n[Error]: System only accepts numeric option items!\n");
+            clearInputBuffer();
+            continue;
+        }
 
         switch (choice) {
             case 1:
@@ -62,14 +69,16 @@ int main() {
                 break;
             case 2: {
                 int shapeChoice;
-                printf("\n--- Select Shape Type ---\n");
-                printf("1. Line\n2. Rectangle\n3. Triangle\n4. Circle\n");
-                printf("Enter choice: ");
-                scanf("%d", &shapeChoice);
+                printf("\n[Shape Menu]: 1.Line | 2.Rectangle | 3.Triangle | 4.Circle\nChoice: ");
+                if (scanf("%d", &shapeChoice) != 1) {
+                    printf("[Error]: Invalid input configuration.\n");
+                    clearInputBuffer();
+                    break;
+                }
 
                 int c[6] = {0};
                 if (shapeChoice == 1) {
-                    printf("Enter X1 Y1 X2 Y2: ");
+                    printf("Enter X1 Y1 X2 Y2 (Separated by spaces): ");
                     scanf("%d %d %d %d", &c[0], &c[1], &c[2], &c[3]);
                     addObject(LINE, c);
                 } else if (shapeChoice == 2) {
@@ -77,15 +86,15 @@ int main() {
                     scanf("%d %d %d %d", &c[0], &c[1], &c[2], &c[3]);
                     addObject(RECTANGLE, c);
                 } else if (shapeChoice == 3) {
-                    printf("Enter X1 Y1 X2 Y2 X3 Y3: ");
+                    printf("Enter Vertex Coordinates (X1 Y1 X2 Y2 X3 Y3): ");
                     scanf("%d %d %d %d %d %d", &c[0], &c[1], &c[2], &c[3], &c[4], &c[5]);
                     addObject(TRIANGLE, c);
                 } else if (shapeChoice == 4) {
-                    printf("Enter Center (Xc Yc) and Radius: ");
+                    printf("Enter Center Position (Xc Yc) and Radius: ");
                     scanf("%d %d %d", &c[0], &c[1], &c[2]);
                     addObject(CIRCLE, c);
                 } else {
-                    printf("Invalid shape type.\n");
+                    printf("[Error]: Unknown shape category selection.\n");
                 }
                 break;
             }
@@ -96,9 +105,9 @@ int main() {
                 int id;
                 listObjects();
                 if (objectCount > 0) {
-                    printf("Enter Object ID to delete: ");
-                    scanf("%d", &id);
-                    deleteObject(id);
+                    printf("Enter target Object ID to purge: ");
+                    if (scanf("%d", &id) == 1) deleteObject(id);
+                    else clearInputBuffer();
                 }
                 break;
             }
@@ -106,22 +115,22 @@ int main() {
                 int id;
                 listObjects();
                 if (objectCount > 0) {
-                    printf("Enter Object ID to modify: ");
-                    scanf("%d", &id);
-                    modifyObject(id);
+                    printf("Enter target Object ID to alter: ");
+                    if (scanf("%d", &id) == 1) modifyObject(id);
+                    else clearInputBuffer();
                 }
                 break;
             }
             case 6:
                 initCanvas();
-                objectCount = 0; // Wipe history
-                printf("\nCanvas completely reset.\n");
+                objectCount = 0; 
+                printf("\n[System]: System space initialized. All object indices purged.\n");
                 break;
             case 7:
-                printf("\nExiting program.\n");
+                printf("\nExiting Editor Environment. Clean memory exit status initialized.\n");
                 exit(0);
             default:
-                printf("\nInvalid option. Try again.\n");
+                printf("\n[Error]: Choice matches no valid operational commands.\n");
         }
     }
     return 0;
@@ -136,8 +145,12 @@ void initCanvas() {
 }
 
 void printCanvas() {
+    printf("\n   ");
+    for(int j=0; j<COLS; j++) if(j%5==0) printf("%-2d", j); else if(j%5!=1) printf(" ");
     printf("\n");
+    
     for (int i = 0; i < ROWS; i++) {
+        printf("%2d ", i);
         for (int j = 0; j < COLS; j++) {
             printf("%c ", canvas[i][j]);
         }
@@ -149,10 +162,13 @@ int checkBounds(int x, int y) {
     return (x >= 0 && x < COLS && y >= 0 && y < ROWS);
 }
 
-// Day 2 Logic: Saves structural parameters to history table, then triggers render
+void clearInputBuffer() {
+    while (getchar() != '\n');
+}
+
 void addObject(ShapeType type, int c[]) {
     if (objectCount >= MAX_OBJECTS) {
-        printf("Error: Object storage memory full!\n");
+        printf("[Allocation Error]: Vector registry array limits breached!\n");
         return;
     }
     objectList[objectCount].id = objectCount + 1;
@@ -163,66 +179,63 @@ void addObject(ShapeType type, int c[]) {
     }
     objectCount++;
     redrawCanvas();
-    printf("Object added successfully as ID: %d\n", objectCount);
+    printf("[System]: Render node logged as Object Reference Assignment ID: %d\n", objectCount);
 }
 
-// Day 2 Logic: Deactivates an item and re-renders the survivors
 void deleteObject(int id) {
     for (int i = 0; i < objectCount; i++) {
         if (objectList[i].id == id && objectList[i].active == 1) {
             objectList[i].active = 0;
             redrawCanvas();
-            printf("Object ID %d deleted successfully.\n", id);
+            printf("[System]: Object %d detached successfully.\n", id);
             return;
         }
     }
-    printf("Object ID not found.\n");
+    printf("[System Error]: ID pointer index mismatch.\n");
 }
 
-// Day 2 Logic: Updates targeted metrics in place
 void modifyObject(int id) {
     for (int i = 0; i < objectCount; i++) {
         if (objectList[i].id == id && objectList[i].active == 1) {
-            printf("Enter new coordinates for this object:\n");
+            printf("[Target Found]: Input revised coordinate arrays:\n");
             if (objectList[i].type == LINE || objectList[i].type == RECTANGLE) {
-                printf("Enter 4 values (X1 Y1 X2 Y2): ");
+                printf("Enter (X1 Y1 X2 Y2): ");
                 scanf("%d %d %d %d", &objectList[i].coords[0], &objectList[i].coords[1], &objectList[i].coords[2], &objectList[i].coords[3]);
             } else if (objectList[i].type == TRIANGLE) {
-                printf("Enter 6 values (X1 Y1 X2 Y2 X3 Y3): ");
+                printf("Enter (X1 Y1 X2 Y2 X3 Y3): ");
                 scanf("%d %d %d %d %d %d", &objectList[i].coords[0], &objectList[i].coords[1], &objectList[i].coords[2], &objectList[i].coords[3], &objectList[i].coords[4], &objectList[i].coords[5]);
             } else if (objectList[i].type == CIRCLE) {
-                printf("Enter 3 values (Xc Yc Radius): ");
+                printf("Enter (Xc Yc Radius): ");
                 scanf("%d %d %d", &objectList[i].coords[0], &objectList[i].coords[1], &objectList[i].coords[2]);
             }
             redrawCanvas();
-            printf("Object ID %d modified successfully.\n", id);
+            printf("[System]: Update successful. Target node redrawn.\n");
             return;
         }
     }
-    printf("Object ID not found.\n");
+    printf("[System Error]: Alteration aborted. Missing ID reference link.\n");
 }
 
-// Day 2 Logic: Displays current working vector objects list
 void listObjects() {
-    int count = 0;
-    printf("\n--- Active Geometric Objects ---\n");
+    int activeTracker = 0;
+    printf("\n================ ACTIVE REGISTRY OBJ LIST ================\n");
     for (int i = 0; i < objectCount; i++) {
         if (objectList[i].active) {
-            count++;
-            printf("ID: %d | Type: ", objectList[i].id);
-            if (objectList[i].type == LINE) printf("Line");
-            else if (objectList[i].type == RECTANGLE) printf("Rectangle");
-            else if (objectList[i].type == TRIANGLE) printf("Triangle");
-            else if (objectList[i].type == CIRCLE) printf("Circle");
+            activeTracker++;
+            printf(" -> [ID %d] Matrix Type: ", objectList[i].id);
+            if (objectList[i].type == LINE) printf("Line Vector Configuration");
+            else if (objectList[i].type == RECTANGLE) printf("Perimeter Rectangle Bounds");
+            else if (objectList[i].type == TRIANGLE) printf("Isosceles/Scalene Triangle Structure");
+            else if (objectList[i].type == CIRCLE) printf("Radial Circle Plot");
             printf("\n");
         }
     }
-    if (count == 0) printf("(No shapes drawn yet)\n");
+    if (activeTracker == 0) printf("(Virtual canvas memory allocation context remains empty)\n");
+    printf("==========================================================\n");
 }
 
-// Day 2 Logic: Clears the matrix, cycles the structural objects log, and outputs them safely
 void redrawCanvas() {
-    initCanvas(); // Clear background grid completely
+    initCanvas(); 
     for (int i = 0; i < objectCount; i++) {
         if (objectList[i].active) {
             int *c = objectList[i].coords;
@@ -234,7 +247,7 @@ void redrawCanvas() {
     }
 }
 
-/* Math Drawing Implementations */
+/* Day 3 Hardened Render Math Engines */
 void drawLine(int x1, int y1, int x2, int y2) {
     int dx = x2 - x1, dy = y2 - y1;
     int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
@@ -261,14 +274,18 @@ void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
 }
 
 void drawCircle(int xc, int yc, int radius) {
-    for (int y = yc - radius; y <= yc + radius; y++) {
-        for (int x = xc - radius; x <= xc + radius; x++) {
-            if (checkBounds(x, y)) {
-                int dx = x - xc, dy = y - yc;
-                double dist = sqrt(dx*dx + dy*dy);
-                if (dist >= radius - 0.5 && dist <= radius + 0.5) {
-                    canvas[y][x] = '*';
-                }
+    // Day 3 Boundary Shielding: Dynamically cuts calculation sizes down if circles exceed boundaries
+    int startY = (yc - radius < 0) ? 0 : yc - radius;
+    int endY = (yc + radius >= ROWS) ? ROWS - 1 : yc + radius;
+    int startX = (xc - radius < 0) ? 0 : xc - radius;
+    int endX = (xc + radius >= COLS) ? COLS - 1 : xc + radius;
+
+    for (int y = startY; y <= endY; y++) {
+        for (int x = startX; x <= endX; x++) {
+            int dx = x - xc, dy = y - yc;
+            double dist = sqrt(dx*dx + dy*dy);
+            if (dist >= radius - 0.5 && dist <= radius + 0.5) {
+                canvas[y][x] = '*';
             }
         }
     }

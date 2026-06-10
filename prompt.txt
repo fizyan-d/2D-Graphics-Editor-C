@@ -1,0 +1,37 @@
+================================================================================
+          AI PROMPTING HISTORY - 2D GRAPHICS EDITOR ASSIGNMENT
+================================================================================
+
+--- DAY 1 PROMPTS: ARCHITECTURE & SHAPE ENGINES ---
+
+[Prompt 1 - Initial Structure]
+I am building a university assignment in C. I need to create a menu-driven 2D Graphics Editor. The viewport/canvas must be stored using a 2D character matrix array (20 rows by 50 columns). Initialize the entire board with underscores ('_') representing blank space. Build a basic console switch-case menu loop that handles printing the canvas and exiting cleanly. 
+
+[Prompt 2 - Mathematical Graphing Logic]
+Now I need to implement the core graphics algorithms using standard logic without external graphics headers. Write standalone C functions for drawing shapes onto our 2D array by replacing underscores with asterisks ('*'). 
+I need:
+1. drawLine: Use a simplified DDA/step-based approach using increments.
+2. drawRectangle: Plot four outer edges by linking coordinate lines together.
+3. drawTriangle: Connect three distinct coordinate vertices using our line function.
+4. drawCircle: Use the circle equation (x-xc)^2 + (y-yc)^2 = r^2 to check distance boundaries and draw a clean circle border line.
+
+
+--- DAY 2 PROMPTS: STRUCTURAL COMPONENT TRACKING ---
+
+[Prompt 3 - Memory Array Vectorization]
+Right now, shapes drawn on the matrix cannot be deleted individually because the system just changes array indices to asterisks. To support the "modify and delete specific objects" requirement, we need a history system. Let's design a C 'struct' called GraphicalObject that logs a tracking ID, an enum for ShapeType, an array for its raw coordinate variables, and a boolean 'active' flag. Implement an object list array to keep track of every shape drawn.
+
+[Prompt 4 - Manipulation Functions]
+Write functions to handle changing this new history data structure:
+1. addObject: Saves coordinate parameters to the list array and renders the shape.
+2. deleteObject: Toggles the 'active' flag of an ID to 0, completely clears the 2D matrix back to underscores, and loops through the array history to redraw only the surviving shapes.
+3. modifyObject: Finds an active object by ID and lets the user input completely new coordinate sets, then runs a full canvas refresh.
+
+
+--- DAY 3 PROMPTS: HARDENING & VALIDATION ---
+
+[Prompt 5 - Input Scrubber & Matrix Boundary Safety]
+The code is functional, but it crashes if someone enters text into the menu or provides coordinates that go outside our array dimensions (like a massive circle radius). Let's protect the program for final evaluation:
+1. Add input validation logic using scanf checks to clean the stdin input buffer if a user types random strings, preventing infinite loops.
+2. Update the circle drawing loop to clip calculations safely within 0 to ROWS and 0 to COLS to prevent array buffer overflows.
+3. Clean up the printCanvas function to add numbered coordinate ticks along the top and left side of the terminal view so it looks like an accurate grid map interface.
